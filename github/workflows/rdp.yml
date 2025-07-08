@@ -1,0 +1,26 @@
+name: Run ngrok in GitHub Actions
+
+on: [push]
+
+jobs:
+  run-ngrok:
+    runs-on: windows-latest
+
+    steps:
+    - name: Download ngrok
+      run: Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+      shell: pwsh
+
+    - name: Extract ngrok
+      run: Expand-Archive ngrok.zip -DestinationPath .
+      shell: pwsh
+
+    - name: Add ngrok auth token
+      run: .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+      shell: pwsh
+      env:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+
+    - name: Run ngrok tunnel (e.g., HTTP port 80)
+      run: .\ngrok.exe http 80
+      shell: pwsh
